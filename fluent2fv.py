@@ -6,18 +6,18 @@ import numpy as np
 #                     删除文件夹中不需要的结果文件
 # ===================================================================
 # 改变当前工作路径
-path = r"C:\Users\B201-18\Desktop\fluent_ly\Paper1\Case4_cycle\Case4_cycle_result"
+path = r"C:\Users\B201-18\Desktop\fluent_ly\Paper1\Case6_cycle\Case6_cycle_result"
 os.chdir(path)
 # result_0d = 'CalData.txt'       # 3d 边界条件结果
-result_0d = 'result_output.out'       # 3d 边界条件结果
-resultStr = 'Case4_cycle_udf-'       # 不同的case需要修改结果文件的前缀
-fvname = 'Case4_cycle'     # fieldview 格式输出文件名
+result_0d = 'output_result.out'       # 3d 边界条件结果
+resultStr = 'Case6_cycle_udf-'       # 不同的case需要修改结果文件的前缀
+fvname = 'Case6_cycle'     # fieldview 格式输出文件名
 geom_filename = 'geom.csv'      # 几何文件
-mesh_style = 0                  # 网格类型 struct : mesh_style = 1 || unstruct mesh_style = 0
+mesh_style = 1                  # 网格类型 struct : mesh_style = 1 || unstruct mesh_style = 0
 step = 0                        # 判断程序处理 step = 1 || cycle = 0
 # 获取最后一个循环周期的序号 与 计算结果
-dt = 0.001
-T = 0.8
+dt = 0.0003125
+T = 0.625
 total_step = (int)(T/dt)
 
 # 获取结果文件的序号
@@ -41,7 +41,7 @@ lastcycle_filenumber = resultData[-(total_step+1):-1, 0]                     # s
 lastcycle_bcresult = resultData[-(total_step+1):-1, 1:].astype(np.float)     # float
 
 # 3D 边界条件 与 计算结果输出
-np.savetxt('lastcycle_bcresult.csv', lastcycle_bcresult, delimiter=',')
+np.savetxt(fvname+'_lastcycle_bcresult.csv', lastcycle_bcresult, delimiter=',')
 
 # 获取最后一个循环周期的结果文件名称
 lastCycle_filenames = []
@@ -97,7 +97,7 @@ for i in range(total_step):
     maxWallShear.append(df.loc[maxWallShear_index, 'wall-shear'])  # loc 时 需要用行与列索引的名字
 
 # 将最大的壁面剪应力输出
-np.savetxt('maxWallShear.csv', np.array(maxWallShear), delimiter=',')
+np.savetxt(fvname+'_maxWallShear.csv', np.array(maxWallShear), delimiter=',')
 
 # ===================================================================
 #                         计算壁面相关参数
@@ -179,7 +179,7 @@ sort_flag = sort_temp[:, -1]                         # 几何坐标系 与 计�
 sort_temp2 = np.column_stack((sort_flag, sort_temp2))
 sorted_datas = sort_temp2[np.lexsort(sort_temp2[:, ::-1].T)]
 # 3D 壁面计算结果输出
-np.savetxt('lastcycle_wallresult_cycle.csv', sorted_datas, delimiter=',')
+np.savetxt(fvname+'_lastcycle_wallresult_cycle.csv', sorted_datas, delimiter=',')
 
 # write the "xxx_ASCII_fieldview_results.fv" file
 output_filename = fvname + '_ASCII_fieldview_results.fv'
