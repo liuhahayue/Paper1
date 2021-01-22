@@ -10,7 +10,7 @@ path = r"C:\Users\B201-18\Desktop\fluent_ly\Paper1\Case7_application\Case7_appli
 os.chdir(path)
 result_0d = 'CalData.txt'       # 3d 边界条件结果
 resultStr = 'Case5_step-'       # 不同的case需要修改结果文件的前缀 此处应该将所有的统一！！！
-fvname = 'Case7_step_cycle'     # fieldview 格式输出文件名
+fvname = 'Case7_cycle'     # fieldview 格式输出文件名
 geom_filename = 'geom.csv'      # 几何文件
 mesh_style = 1                  # 网格类型 struct : mesh_style = 1 || unstruct mesh_style = 0
 step = 1                        # 判断程序处理 step = 1 || cycle = 0
@@ -36,11 +36,16 @@ with open(result_0d, "r") as f:
 
 # list 2 numpy
 resultData = np.array(resultData)
-lastcycle_bcresult = resultData[(rm_total_step-1):-1, 1:].astype(np.float)
-lastcycle_filenumber = resultData[(rm_total_step-1):-1, 0]
+# lastcycle_bcresult = resultData[(rm_total_step-1):-1, 1:].astype(np.float)
+# lastcycle_filenumber = resultData[(rm_total_step-1):-1, 0]
+# 提取周期性计算结果时只需要头一个计算周期的结果
+cycle_start = rm_total_step-1
+cycle_end = rm_total_step-1 + rm_total_step
+lastcycle_bcresult = resultData[cycle_start:cycle_end, 1:].astype(np.float)
+lastcycle_filenumber = resultData[cycle_start:cycle_end, 0]
 
 # 3D 边界条件 与 计算结果输出
-np.savetxt('lastcycle_bcresult.csv', lastcycle_bcresult, delimiter=',')
+np.savetxt(fvname+'_lastcycle_bcresult.csv', lastcycle_bcresult, delimiter=',')
 
 # 获取最后一个循环周期的结果文件名称
 lastCycle_filenames = []
@@ -53,11 +58,12 @@ for caseNumber in lastcycle_filenumber:
 # 更新 total step
 total_step = len(lastCycle_filenames)
 
+# 提取周期性计算结果时应将下面的语句屏蔽
 # 将不符合要求的文件删除
-files = os.listdir(path)
-for f in files:
-    if (resultStr in f) and (f not in lastCycle_filenames):
-        os.remove(f)
+# files = os.listdir(path)
+# for f in files:
+    # if (resultStr in f) and (f not in lastCycle_filenames):
+        # os.remove(f)
 
 # ===================================================================
 #                         读取结果文件
@@ -96,7 +102,7 @@ for i in range(total_step):
     maxWallShear.append(df.loc[maxWallShear_index, 'wall-shear'])  # loc 时 需要用行与列索引的名字
 
 # 保存最大壁面剪应力文件
-np.savetxt('maxWallShear.csv', np.array(maxWallShear), delimiter=',')
+np.savetxt(fvname+'_maxWallShear.csv', np.array(maxWallShear), delimiter=',')
 
 # ===================================================================
 #                         计算壁面相关参数
@@ -178,7 +184,7 @@ sort_flag = sort_temp[:, -1]                         # 几何坐标系 与 计�
 sort_temp2 = np.column_stack((sort_flag, sort_temp2))
 sorted_datas = sort_temp2[np.lexsort(sort_temp2[:, ::-1].T)]
 # 3D 壁面计算结果输出
-np.savetxt('lastcycle_wallresult_cycle.csv', sorted_datas, delimiter=',')
+np.savetxt(fvname+'_lastcycle_wallresult_cycle.csv', sorted_datas, delimiter=',')
 
 # write the "xxx_ASCII_fieldview_results.fv" file
 output_filename = fvname + '_ASCII_fieldview_results.fv'
