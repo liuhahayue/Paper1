@@ -5,12 +5,14 @@ import numpy as np
 #                            读取 FieldView 结果文件
 # ===================================================================
 # 改变路径
-path = r"C:\Users\B201-18\Desktop\fluent_ly\Paper1\Case1_step\Result"
+path = r"C:\Users\B201-18\Desktop\Fluent2FV\python\Paper1_Result_FV\Case5"
 os.chdir(path)
-fvname = "Case1_cycle_step"
+fvname = "Case5_cycle_step"
+fv_stepname = "Case5_step"
+fv_cyclename = "Case6_cycle"
 
 # Step
-filenames = "Case1_step_ASCII_fieldview_results.fv"
+filenames = fv_stepname+"_ASCII_fieldview_results.fv"
 stepDatas = []
 with open(filenames, "r") as f:
     for line in f.readlines()[19:]:
@@ -19,13 +21,9 @@ with open(filenames, "r") as f:
 
 # list 2 numpy
 stepDatas = np.array(stepDatas).astype(np.float)
-# print(stepDatas.shape)
 
-# 改变路径
-path = r"C:\Users\B201-18\Desktop\fluent_ly\Paper1\Case2_cycle\Case1_cycle_result"
-os.chdir(path)
 # Cycle
-filenames = "Case1_cycle_ASCII_fieldview_results.fv"
+filenames = fv_cyclename+"_ASCII_fieldview_results.fv"
 cycleDatas = []
 with open(filenames, "r") as f:
     for line in f.readlines()[19:]:
@@ -34,10 +32,10 @@ with open(filenames, "r") as f:
 
 # list 2 numpy
 cycleDatas = np.array(cycleDatas).astype(np.float)
-# print(cycleDatas.shape)
 
 # Calculate difference
-Difference_step2cycle = cycleDatas - stepDatas
+# Difference_step2cycle = cycleDatas - stepDatas        # 二者的差异单纯做减法
+Difference_step2cycle = np.abs(cycleDatas - stepDatas)  # 二者的差异取绝对值
 node_number = Difference_step2cycle.shape[0]/4
 
 # ==================================================================
